@@ -1,12 +1,13 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
-import { Link, useHistory } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import { FiArrowLeft, FiAlertCircle } from "react-icons/fi";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import axios from "axios";
 import { LeafletMouseEvent } from "leaflet";
 import api from "../../services/api";
 
 import Dropzone from "../../components/Dropzone";
+import Success from "../../components/Success";
 
 import "./styles.css";
 
@@ -51,7 +52,8 @@ const CreatePoint: React.FC = () => {
   ]);
   const [selectedFile, setSelectedFile] = useState<File>();
 
-  const history = useHistory();
+  const [submitStatus, setSubmitStatus] = useState(false);
+  const [errors, setErrors] = useState("");
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -132,6 +134,17 @@ const CreatePoint: React.FC = () => {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
+    if (
+      selectedUf === "0" ||
+      selectedCity === "0" ||
+      !selectedItems ||
+      selectedPosition[0] === 0 ||
+      !selectedFile
+    ) {
+      setErrors("Informações faltando.");
+      return;
+    }
+
     console.log(selectedFile);
 
     const { name, email, whatsapp } = formData;
@@ -157,13 +170,14 @@ const CreatePoint: React.FC = () => {
 
     await api.post("points", data);
 
-    alert("Ponto de coleta criado!");
-
-    history.push("/");
+    setSubmitStatus(true);
+    setErrors("");
   }
 
   return (
     <div id="page-create-point">
+      <Success isOpen={submitStatus} />
+
       <header>
         <img src={logo} alt="Ecoleta" />
 
@@ -192,6 +206,7 @@ const CreatePoint: React.FC = () => {
               name="name"
               id="name"
               onChange={handleInputChange}
+              required
             />
           </div>
 
@@ -203,6 +218,7 @@ const CreatePoint: React.FC = () => {
                 name="email"
                 id="email"
                 onChange={handleInputChange}
+                required
               />
             </div>
             <div className="field">
@@ -212,6 +228,7 @@ const CreatePoint: React.FC = () => {
                 name="whatsapp"
                 id="whatsapp"
                 onChange={handleInputChange}
+                required
               />
             </div>
           </div>
@@ -289,7 +306,15 @@ const CreatePoint: React.FC = () => {
           </ul>
         </fieldset>
 
-        <button type="submit">Cadastrar ponto de coleta</button>
+        <div className="button-form">
+          {errors === "" ? null : (
+            <span>
+              <FiAlertCircle />
+              {errors}
+            </span>
+          )}
+          <button type="submit">Cadastrar ponto de coleta</button>
+        </div>
       </form>
     </div>
   );
