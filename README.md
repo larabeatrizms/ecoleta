@@ -209,4 +209,4 @@ Depois que o seu pull request é dado o merge, voê pode deletar sua branch.
 - Github: [@larabeatrizms](https://github.com/larabeatrizms)
 - LinkedIn: [@larabeatrizms](https://linkedin.com/in/larabeatrizms)
 
-Feito com 💜
+Feito com 💜 by Lara
